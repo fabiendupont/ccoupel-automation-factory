@@ -37,7 +37,7 @@ import { usePlaybookEditorStore } from '../../stores/playbookEditorStore'
 // Collaboration callback types for real-time sync
 export interface CollaborationCallbacks {
   sendModuleAdd?: (data: { moduleId: string; module: ModuleBlock; position: { x: number; y: number } }) => void
-  sendModuleMove?: (data: { moduleId: string; x: number; y: number; parentId?: string; parentSection?: string }) => void
+  sendModuleMove?: (data: { moduleId: string; x: number; y: number; parentId?: string; parentSection?: 'normal' | 'rescue' | 'always' | 'pre_tasks' | 'tasks' | 'post_tasks' | 'handlers' }) => void
   sendModuleDelete?: (data: { moduleId: string }) => void
   sendModuleConfig?: (data: { moduleId: string; field: string; value: unknown; element_id?: string }) => void
   sendModuleResize?: (data: { moduleId: string; width: number; height: number; x: number; y: number }) => void

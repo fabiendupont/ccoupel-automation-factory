@@ -379,7 +379,7 @@ export const ModulesTreeView = ({ searchQuery = '', onModuleDragStart }: Modules
   const displayedNamespaces = getDisplayedNamespaces()
 
   // Handle node expansion - load data lazily
-  const handleExpandedItemsChange = async (event: React.SyntheticEvent, nodeIds: string[]) => {
+  const handleExpandedItemsChange = async (_event: React.SyntheticEvent | null, nodeIds: string[]) => {
     setExpandedItems(nodeIds)
 
     const newlyExpanded = nodeIds.filter(id => !expandedItems.includes(id))

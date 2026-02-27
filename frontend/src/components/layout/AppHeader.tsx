@@ -773,16 +773,16 @@ const AppHeader: React.FC<AppHeaderProps> = ({
               </Typography>
 
               {/* Backend Features */}
-              {backendVersionInfo?.features?.features?.length > 0 && (
+              {(backendVersionInfo?.features?.features?.length ?? 0) > 0 && (
                 <>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }}></Box>
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold' }}>
-                      Backend API - {backendVersionInfo.features.title}
+                      Backend API - {backendVersionInfo!.features!.title}
                     </Typography>
                   </Box>
                   <Box component="ul" sx={{ pl: 3, m: 0, mb: 2 }}>
-                    {backendVersionInfo.features.features.map((feature: string, index: number) => (
+                    {backendVersionInfo!.features!.features!.map((feature: string, index: number) => (
                       <Typography key={index} component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                         🔧 {feature}
                       </Typography>
@@ -814,7 +814,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
               </Box>
 
               {/* Backend Improvements */}
-              {backendVersionInfo?.features?.improvements?.length > 0 && (
+              {(backendVersionInfo?.features?.improvements?.length ?? 0) > 0 && (
                 <>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'warning.main' }}></Box>
@@ -823,7 +823,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
                     </Typography>
                   </Box>
                   <Box component="ul" sx={{ pl: 3, m: 0, mb: 2 }}>
-                    {backendVersionInfo.features.improvements.map((improvement: string, index: number) => (
+                    {backendVersionInfo!.features!.improvements!.map((improvement: string, index: number) => (
                       <Typography key={index} component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                         ⚙️ {improvement}
                       </Typography>

@@ -260,7 +260,7 @@ export const useCanvasDragDrop = ({ collaborationCallbacks, canvasRef }: UseCanv
 
     // Drop in block container
     if (blockContainerElem && !isMovingBlockOrPlay) {
-      const blockId = blockContainerElem.getAttribute('data-block-id')
+      const blockId = blockContainerElem.getAttribute('data-block-id')!
       const block = modules.find(m => m.id === blockId)
 
       if (block && block.isBlock) {
@@ -346,12 +346,12 @@ export const useCanvasDragDrop = ({ collaborationCallbacks, canvasRef }: UseCanv
             return prev.map(m => {
               if (m.id === movedModule.parentId) {
                 const sections = m.blockSections || { normal: [], rescue: [], always: [] }
-                const oldSection = movedModule.parentSection!
+                const oldSection = movedModule.parentSection as 'normal' | 'rescue' | 'always'
                 return {
                   ...m,
                   blockSections: {
                     ...sections,
-                    [oldSection]: sections[oldSection].filter(id => id !== existingModuleId),
+                    [oldSection]: sections[oldSection].filter((id: string) => id !== existingModuleId),
                   },
                 }
               }
@@ -520,11 +520,12 @@ export const useCanvasDragDrop = ({ collaborationCallbacks, canvasRef }: UseCanv
             return prev.map(m => {
               if (oldParentId && m.id === oldParentId) {
                 const sections = m.blockSections || { normal: [], rescue: [], always: [] }
+                const blockSection = oldSection as 'normal' | 'rescue' | 'always'
                 return {
                   ...m,
                   blockSections: {
                     ...sections,
-                    [oldSection!]: sections[oldSection!].filter(id => id !== sourceId),
+                    [blockSection]: sections[blockSection].filter((id: string) => id !== sourceId),
                   },
                 }
               }
@@ -674,11 +675,12 @@ export const useCanvasDragDrop = ({ collaborationCallbacks, canvasRef }: UseCanv
           setModules(prev => prev.map(m => {
             if (oldParentId && m.id === oldParentId && oldSection) {
               const sections = m.blockSections || { normal: [], rescue: [], always: [] }
+              const blockSection = oldSection as 'normal' | 'rescue' | 'always'
               return {
                 ...m,
                 blockSections: {
                   ...sections,
-                  [oldSection]: sections[oldSection].filter(id => id !== sourceId),
+                  [blockSection]: sections[blockSection].filter((id: string) => id !== sourceId),
                 },
               }
             }

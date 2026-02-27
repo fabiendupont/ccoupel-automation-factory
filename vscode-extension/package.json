@@ -1,0 +1,88 @@
+{
+  "name": "automation-factory",
+  "displayName": "Automation Factory",
+  "description": "Visual editor for Ansible playbooks — view plays, sections, tasks, blocks, and links as a graph.",
+  "version": "0.1.0",
+  "publisher": "ccoupel",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "ansible",
+    "playbook",
+    "yaml",
+    "visual",
+    "graph"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "automationFactory.playbookViewer",
+        "displayName": "Ansible Playbook Visual Editor",
+        "selector": [
+          { "filenamePattern": "*.yml" },
+          { "filenamePattern": "*.yaml" }
+        ],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      {
+        "command": "automationFactory.openVisual",
+        "title": "Open as Visual Graph",
+        "category": "Automation Factory"
+      },
+      {
+        "command": "automationFactory.openTextEditor",
+        "title": "Open as Text",
+        "category": "Automation Factory",
+        "icon": "$(code)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "automationFactory.openTextEditor",
+          "when": "activeCustomEditorId == automationFactory.playbookViewer",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "automationFactory.openVisual",
+          "when": "resourceExtname == .yml || resourceExtname == .yaml",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "@af/shared": "*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "esbuild": "^0.24.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.0",
+    "yaml": "^2.6.0",
+    "zustand": "^5.0.0"
+  }
+}

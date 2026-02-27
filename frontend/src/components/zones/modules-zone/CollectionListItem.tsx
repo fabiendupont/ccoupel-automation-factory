@@ -36,7 +36,7 @@ export const CollectionListItem = ({
   onNavigateToVersions,
   onNavigateToModules,
 }: CollectionListItemProps) => {
-  const isIncompatible = collection.requires_ansible &&
+  const isIncompatible = !!collection.requires_ansible &&
     !isVersionCompatible(ansibleVersion, collection.requires_ansible)
 
   return (

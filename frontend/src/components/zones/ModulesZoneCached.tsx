@@ -387,7 +387,7 @@ const ModulesZoneCached = ({ onCollapse, activeSectionTab }: ModulesZoneCachedPr
         case 'collections':
           return b.collection_count - a.collection_count
         case 'downloads':
-          return b.total_downloads - a.total_downloads
+          return (b.total_downloads ?? 0) - (a.total_downloads ?? 0)
         default:
           return 0
       }
