@@ -1,4 +1,9 @@
-import { memo, useState, useCallback } from 'react'
+import { memo, useState, useCallback, useEffect, useRef } from 'react'
+import type { CollectionInfo, GalaxyModuleInfo, HostToWebviewMessage } from '@af/shared'
+import { BUILTIN_CATEGORIES, type BuiltinModule } from '../data/builtinModules'
+import { getVsCodeApi } from '../vscodeApi'
+
+const SEARCH_DEBOUNCE_MS = 400
 
 interface ModuleEntry {
   name: string
@@ -6,66 +11,39 @@ interface ModuleEntry {
   description: string
 }
 
-interface Category {
-  label: string
-  modules: ModuleEntry[]
-}
-
-const CATEGORIES: Category[] = [
-  {
-    label: 'Files',
-    modules: [
-      { name: 'copy', collection: 'ansible.builtin', description: 'Copy files to remote' },
-      { name: 'template', collection: 'ansible.builtin', description: 'Jinja2 templating' },
-      { name: 'file', collection: 'ansible.builtin', description: 'Manage file properties' },
-      { name: 'lineinfile', collection: 'ansible.builtin', description: 'Manage lines in files' },
-      { name: 'fetch', collection: 'ansible.builtin', description: 'Fetch files from remote' },
-    ],
-  },
-  {
-    label: 'System',
-    modules: [
-      { name: 'command', collection: 'ansible.builtin', description: 'Run commands' },
-      { name: 'shell', collection: 'ansible.builtin', description: 'Run shell commands' },
-      { name: 'service', collection: 'ansible.builtin', description: 'Manage services' },
-      { name: 'systemd', collection: 'ansible.builtin', description: 'Manage systemd units' },
-      { name: 'user', collection: 'ansible.builtin', description: 'Manage user accounts' },
-      { name: 'group', collection: 'ansible.builtin', description: 'Manage groups' },
-      { name: 'cron', collection: 'ansible.builtin', description: 'Manage cron jobs' },
-    ],
-  },
-  {
-    label: 'Packages',
-    modules: [
-      { name: 'apt', collection: 'ansible.builtin', description: 'Apt package manager' },
-      { name: 'yum', collection: 'ansible.builtin', description: 'Yum package manager' },
-      { name: 'dnf', collection: 'ansible.builtin', description: 'DNF package manager' },
-      { name: 'pip', collection: 'ansible.builtin', description: 'Python pip packages' },
-      { name: 'package', collection: 'ansible.builtin', description: 'Generic packages' },
-    ],
-  },
-  {
-    label: 'Control',
-    modules: [
-      { name: 'debug', collection: 'ansible.builtin', description: 'Print debug messages' },
-      { name: 'fail', collection: 'ansible.builtin', description: 'Fail with message' },
-      { name: 'assert', collection: 'ansible.builtin', description: 'Assert conditions' },
-      { name: 'pause', collection: 'ansible.builtin', description: 'Pause execution' },
-      { name: 'wait_for', collection: 'ansible.builtin', description: 'Wait for condition' },
-      { name: 'set_fact', collection: 'ansible.builtin', description: 'Set host facts' },
-      { name: 'include_tasks', collection: 'ansible.builtin', description: 'Include tasks file' },
-    ],
-  },
-  {
-    label: 'Structure',
-    modules: [
-      { name: 'block', collection: '', description: 'Group tasks with error handling' },
-    ],
-  },
-]
-
 export const ModulePalette = memo(function ModulePalette() {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const [searchQuery, setSearchQuery] = useState('')
+  const [galaxyCollections, setGalaxyCollections] = useState<CollectionInfo[]>([])
+  const [galaxyError, setGalaxyError] = useState<string | undefined>()
+  const [galaxySearching, setGalaxySearching] = useState(false)
+  const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set())
+  const [collectionModules, setCollectionModules] = useState<Record<string, GalaxyModuleInfo[]>>({})
+  const [loadingModules, setLoadingModules] = useState<Set<string>>(new Set())
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>()
+
+  // Listen for Galaxy messages from extension host
+  useEffect(() => {
+    const handler = (e: MessageEvent<HostToWebviewMessage>) => {
+      const msg = e.data
+      if (msg.type === 'galaxy:search-result') {
+        setGalaxyCollections(msg.collections)
+        setGalaxyError(msg.error)
+        setGalaxySearching(false)
+      }
+      if (msg.type === 'galaxy:modules-result') {
+        const key = `${msg.namespace}.${msg.collection}`
+        setCollectionModules((prev) => ({ ...prev, [key]: msg.modules }))
+        setLoadingModules((prev) => {
+          const next = new Set(prev)
+          next.delete(key)
+          return next
+        })
+      }
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [])
 
   const toggle = useCallback((label: string) => {
     setCollapsed((prev) => {
@@ -87,10 +65,73 @@ export const ModulePalette = memo(function ModulePalette() {
     [],
   )
 
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value)
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+
+    if (!value.trim()) {
+      setGalaxyCollections([])
+      setGalaxyError(undefined)
+      setGalaxySearching(false)
+      return
+    }
+
+    setGalaxySearching(true)
+    searchTimerRef.current = setTimeout(() => {
+      getVsCodeApi().postMessage({ type: 'galaxy:search', query: value.trim() })
+    }, SEARCH_DEBOUNCE_MS)
+  }, [])
+
+  const toggleCollection = useCallback((ns: string, col: string) => {
+    const key = `${ns}.${col}`
+    setExpandedCollections((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) {
+        next.delete(key)
+      } else {
+        next.add(key)
+        // Fetch modules if not already loaded
+        if (!collectionModules[key]) {
+          setLoadingModules((prevLoading) => {
+            const nextLoading = new Set(prevLoading)
+            nextLoading.add(key)
+            return nextLoading
+          })
+          getVsCodeApi().postMessage({ type: 'galaxy:modules', namespace: ns, collection: col })
+        }
+      }
+      return next
+    })
+  }, [collectionModules])
+
+  // Filter builtin modules by search query
+  const filteredCategories = searchQuery.trim()
+    ? BUILTIN_CATEGORIES.map((cat) => ({
+        ...cat,
+        modules: cat.modules.filter(
+          (m) =>
+            m.name.includes(searchQuery.toLowerCase()) ||
+            m.description.toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
+      })).filter((cat) => cat.modules.length > 0)
+    : BUILTIN_CATEGORIES
+
   return (
     <div className="module-palette">
       <div className="palette-header">Modules</div>
-      {CATEGORIES.map((cat) => (
+
+      <div className="palette-search">
+        <input
+          type="text"
+          className="palette-search-input"
+          placeholder="Search modules..."
+          value={searchQuery}
+          onChange={(e) => handleSearchChange(e.target.value)}
+        />
+      </div>
+
+      {/* Built-in modules */}
+      {filteredCategories.map((cat) => (
         <div key={cat.label} className="palette-category">
           <div
             className="palette-category-header"
@@ -103,7 +144,7 @@ export const ModulePalette = memo(function ModulePalette() {
           </div>
           {!collapsed.has(cat.label) && (
             <div className="palette-category-body">
-              {cat.modules.map((mod) => (
+              {cat.modules.map((mod: BuiltinModule) => (
                 <div
                   key={mod.name}
                   className="palette-module"
@@ -118,6 +159,76 @@ export const ModulePalette = memo(function ModulePalette() {
           )}
         </div>
       ))}
+
+      {/* Galaxy search results */}
+      {searchQuery.trim() && (
+        <div className="palette-galaxy-section">
+          <div className="palette-galaxy-header">Galaxy</div>
+
+          {galaxySearching && (
+            <div className="palette-galaxy-status">Searching...</div>
+          )}
+
+          {galaxyError && (
+            <div className="palette-galaxy-error">{galaxyError}</div>
+          )}
+
+          {!galaxySearching && !galaxyError && galaxyCollections.length === 0 && searchQuery.trim() && (
+            <div className="palette-galaxy-status">No collections found</div>
+          )}
+
+          {galaxyCollections.map((col) => {
+            const key = `${col.namespace}.${col.name}`
+            const isExpanded = expandedCollections.has(key)
+            const modules = collectionModules[key]
+            const isLoading = loadingModules.has(key)
+
+            return (
+              <div key={key} className="palette-collection">
+                <div
+                  className="palette-collection-header"
+                  onClick={() => toggleCollection(col.namespace, col.name)}
+                  title={col.description}
+                >
+                  <span className="collapse-icon">
+                    {isExpanded ? '\u25BC' : '\u25B6'}
+                  </span>
+                  <span className="palette-collection-name">{key}</span>
+                  <span className="palette-collection-version">{col.version}</span>
+                </div>
+
+                {isExpanded && (
+                  <div className="palette-collection-body">
+                    {isLoading && (
+                      <div className="palette-galaxy-status">Loading modules...</div>
+                    )}
+                    {modules && modules.length === 0 && !isLoading && (
+                      <div className="palette-galaxy-status">No modules</div>
+                    )}
+                    {modules?.map((mod) => (
+                      <div
+                        key={mod.name}
+                        className="palette-module"
+                        draggable
+                        onDragStart={(e) =>
+                          handleDragStart(e, {
+                            name: mod.name,
+                            collection: `${mod.namespace}.${mod.collection}`,
+                            description: mod.description,
+                          })
+                        }
+                        title={mod.description}
+                      >
+                        {mod.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 })

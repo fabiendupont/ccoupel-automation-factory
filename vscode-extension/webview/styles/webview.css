@@ -634,6 +634,93 @@ code {
   cursor: grabbing;
 }
 
+/* Palette search */
+.palette-search {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.palette-search-input {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 0.85em;
+  font-family: inherit;
+  color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, transparent);
+  border-radius: 3px;
+  outline: none;
+}
+
+.palette-search-input:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+.palette-search-input::placeholder {
+  color: var(--vscode-input-placeholderForeground);
+}
+
+/* Galaxy section */
+.palette-galaxy-section {
+  border-top: 1px solid var(--vscode-panel-border);
+  margin-top: 4px;
+}
+
+.palette-galaxy-header {
+  padding: 6px 10px;
+  font-weight: 600;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--vscode-sideBarTitle-foreground, var(--vscode-descriptionForeground));
+}
+
+.palette-galaxy-status {
+  padding: 4px 10px;
+  font-size: 0.8em;
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+}
+
+.palette-galaxy-error {
+  padding: 4px 10px;
+  font-size: 0.8em;
+  color: var(--vscode-errorForeground);
+}
+
+/* Collection items */
+.palette-collection-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 0.8em;
+  cursor: pointer;
+  color: var(--vscode-editor-foreground);
+}
+
+.palette-collection-header:hover {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.palette-collection-name {
+  flex: 1;
+  font-family: var(--vscode-editor-font-family, monospace);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-collection-version {
+  font-size: 0.9em;
+  color: var(--vscode-descriptionForeground);
+  flex-shrink: 0;
+}
+
+.palette-collection-body {
+  padding: 0 4px 4px 4px;
+}
+
 /* Drop zone highlight */
 .drop-zone {
   transition: background-color 0.15s;
