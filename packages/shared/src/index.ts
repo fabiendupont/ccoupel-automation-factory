@@ -60,3 +60,6 @@ export {
 // YAML parser
 export { parseYaml, isAnsiblePlaybook, TASK_LEVEL_KEYS } from './parsers/yamlParser'
 export type { ParseResult } from './parsers/yamlParser'
+
+// YAML generator
+export { generateYaml } from './generators/yamlGenerator'
