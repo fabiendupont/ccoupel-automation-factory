@@ -1,7 +1,7 @@
 {
   "name": "automation-factory",
   "displayName": "Automation Factory",
-  "description": "Visual editor for Ansible playbooks — view plays, sections, tasks, blocks, and links as a graph.",
+  "description": "Visual editor for Ansible playbooks — view and edit plays, tasks, and links as an interactive graph with bidirectional YAML sync.",
   "version": "0.1.0",
   "publisher": "ccoupel",
   "license": "MIT",
