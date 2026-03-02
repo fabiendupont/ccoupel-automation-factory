@@ -64,10 +64,20 @@ export type { ParseResult } from './parsers/yamlParser'
 // YAML generator
 export { generateYaml } from './generators/yamlGenerator'
 
+// Galaxy types
+export type {
+  CollectionInfo,
+  GalaxyModuleInfo,
+} from './types/galaxy'
+
 // Message protocol
 export type {
   UpdateMessage,
   EditFullMessage,
+  GalaxySearchMessage,
+  GalaxySearchResultMessage,
+  GalaxyModulesMessage,
+  GalaxyModulesResultMessage,
   HostToWebviewMessage,
   WebviewToHostMessage,
 } from './types/messages'
