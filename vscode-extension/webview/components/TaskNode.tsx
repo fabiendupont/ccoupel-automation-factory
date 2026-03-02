@@ -14,6 +14,23 @@ export const TaskNode = memo(function TaskNode({ module }: TaskNodeProps) {
   const handleClick = useCallback(() => {
     setSelectedModuleId(isSelected ? null : module.id)
   }, [isSelected, module.id, setSelectedModuleId])
+
+  const handleDragStart = useCallback(
+    (e: React.DragEvent) => {
+      const rect = e.currentTarget.getBoundingClientRect()
+      e.dataTransfer.setData(
+        'application/x-af-move',
+        JSON.stringify({
+          moduleId: module.id,
+          offsetX: e.clientX - rect.left,
+          offsetY: e.clientY - rect.top,
+        }),
+      )
+      e.dataTransfer.effectAllowed = 'move'
+    },
+    [module.id],
+  )
+
   const fqcn = module.collection ? `${module.collection}.${module.name}` : module.name
 
   const badges: string[] = []
@@ -33,6 +50,8 @@ export const TaskNode = memo(function TaskNode({ module }: TaskNodeProps) {
         top: module.y,
       }}
       onClick={handleClick}
+      draggable
+      onDragStart={handleDragStart}
     >
       <div className="task-name">{module.taskName ?? fqcn}</div>
       <div className="task-fqcn">{fqcn}</div>

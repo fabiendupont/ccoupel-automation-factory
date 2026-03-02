@@ -4,6 +4,7 @@ import { PlayCanvas } from './PlayCanvas'
 import { PropertiesPanel } from './PropertiesPanel'
 import { PlayAttributesPanel } from './PlayAttributesPanel'
 import { VariablesPanel } from './VariablesPanel'
+import { ModulePalette } from './ModulePalette'
 
 export function PlaybookGraph() {
   // Narrow subscriptions: each selector returns a stable value (rule 5.8)
@@ -61,6 +62,7 @@ export function PlaybookGraph() {
 
       {/* Main layout */}
       <div className="graph-layout">
+        <ModulePalette />
         <div className="canvas-container">
           <PlayCanvas play={activePlay} />
         </div>

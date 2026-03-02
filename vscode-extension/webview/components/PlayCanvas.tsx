@@ -1,17 +1,19 @@
 import { memo, useMemo } from 'react'
-import type { Play, ModuleBlock, PlaySectionName } from '@af/shared'
+import type { Play, ModuleBlock } from '@af/shared'
 import { getPlaySectionColor } from '@af/shared'
 import { SectionContent } from './SectionContent'
 import { SectionLinks } from './SectionLinks'
 import { useStore } from '../store'
+import { useCanvasDragDrop } from '../hooks/useCanvasDragDrop'
 
 interface PlayCanvasProps {
   play: Play
 }
 
-const PLAY_SECTIONS: PlaySectionName[] = ['pre_tasks', 'tasks', 'post_tasks', 'handlers']
+type TaskSectionName = 'pre_tasks' | 'tasks' | 'post_tasks' | 'handlers'
+const PLAY_SECTIONS: TaskSectionName[] = ['pre_tasks', 'tasks', 'post_tasks', 'handlers']
 
-function getSectionLabel(section: PlaySectionName): string {
+function getSectionLabel(section: TaskSectionName): string {
   switch (section) {
     case 'pre_tasks': return 'Pre Tasks'
     case 'tasks': return 'Tasks'
@@ -22,6 +24,9 @@ function getSectionLabel(section: PlaySectionName): string {
 }
 
 export const PlayCanvas = memo(function PlayCanvas({ play }: PlayCanvasProps) {
+  const { onDragOver, onDrop } = useCanvasDragDrop()
+  const setLinkingFrom = useStore((s) => s.setLinkingFrom)
+
   // Group modules by section — derive during render (rule 5.1)
   const sectionModules = useMemo(() => {
     const grouped: Record<string, ModuleBlock[]> = {}
@@ -44,7 +49,10 @@ export const PlayCanvas = memo(function PlayCanvas({ play }: PlayCanvasProps) {
   const varCount = play.variables.length
 
   return (
-    <div className="play-canvas">
+    <div
+      className="play-canvas"
+      onClick={() => setLinkingFrom(null)}
+    >
       {/* Play header */}
       <div className="play-header">
         <div className="play-name">{play.name}</div>
@@ -74,7 +82,11 @@ export const PlayCanvas = memo(function PlayCanvas({ play }: PlayCanvasProps) {
                 {modules.filter((m) => !m.isPlay).length}
               </span>
             </div>
-            <div className="section-body">
+            <div
+              className="section-body drop-zone"
+              onDragOver={onDragOver}
+              onDrop={(e) => onDrop(e, section)}
+            >
               <SectionLinks
                 links={sectionLinks}
                 modules={play.modules}
