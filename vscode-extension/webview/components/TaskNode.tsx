@@ -1,3 +1,4 @@
+import { memo, useCallback } from 'react'
 import type { ModuleBlock } from '@af/shared'
 import { useStore } from '../store'
 
@@ -5,9 +6,14 @@ interface TaskNodeProps {
   module: ModuleBlock
 }
 
-export function TaskNode({ module }: TaskNodeProps) {
-  const { selectedModuleId, setSelectedModuleId } = useStore()
-  const isSelected = selectedModuleId === module.id
+export const TaskNode = memo(function TaskNode({ module }: TaskNodeProps) {
+  // Subscribe to derived boolean, not the full selectedModuleId (rule 5.8)
+  const isSelected = useStore((s) => s.selectedModuleId === module.id)
+  const setSelectedModuleId = useStore((s) => s.setSelectedModuleId)
+
+  const handleClick = useCallback(() => {
+    setSelectedModuleId(isSelected ? null : module.id)
+  }, [isSelected, module.id, setSelectedModuleId])
   const fqcn = module.collection ? `${module.collection}.${module.name}` : module.name
 
   const badges: string[] = []
@@ -26,7 +32,7 @@ export function TaskNode({ module }: TaskNodeProps) {
         left: module.x,
         top: module.y,
       }}
-      onClick={() => setSelectedModuleId(isSelected ? null : module.id)}
+      onClick={handleClick}
     >
       <div className="task-name">{module.taskName ?? fqcn}</div>
       <div className="task-fqcn">{fqcn}</div>
@@ -39,4 +45,4 @@ export function TaskNode({ module }: TaskNodeProps) {
       )}
     </div>
   )
-}
+})

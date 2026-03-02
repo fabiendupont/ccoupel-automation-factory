@@ -1,6 +1,8 @@
 import * as vscode from 'vscode'
 import { parseYaml, isAnsiblePlaybook } from '@af/shared'
 
+const DEBOUNCE_MS = 300
+
 export class PlaybookEditorProvider implements vscode.CustomTextEditorProvider {
   static readonly viewType = 'automationFactory.playbookViewer'
 
@@ -47,7 +49,7 @@ export class PlaybookEditorProvider implements vscode.CustomTextEditorProvider {
     const changeSubscription = vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.document.uri.toString() === document.uri.toString()) {
         if (this.debounceTimer) clearTimeout(this.debounceTimer)
-        this.debounceTimer = setTimeout(sendUpdate, 300)
+        this.debounceTimer = setTimeout(sendUpdate, DEBOUNCE_MS)
       }
     })
 

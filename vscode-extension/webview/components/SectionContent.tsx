@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { ModuleBlock } from '@af/shared'
 import { TaskNode } from './TaskNode'
 import { BlockNode } from './BlockNode'
@@ -8,7 +9,7 @@ interface SectionContentProps {
   allModules: ModuleBlock[]
 }
 
-export function SectionContent({ modules, allModules }: SectionContentProps) {
+export const SectionContent = memo(function SectionContent({ modules, allModules }: SectionContentProps) {
   return (
     <div className="section-content">
       {modules.map((mod) => {
@@ -28,4 +29,4 @@ export function SectionContent({ modules, allModules }: SectionContentProps) {
       })}
     </div>
   )
-}
+})

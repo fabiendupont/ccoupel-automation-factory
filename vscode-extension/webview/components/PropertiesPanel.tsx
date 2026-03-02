@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { ModuleBlock } from '@af/shared'
 import { useStore } from '../store'
 
@@ -5,7 +6,7 @@ interface PropertiesPanelProps {
   module: ModuleBlock
 }
 
-export function PropertiesPanel({ module }: PropertiesPanelProps) {
+export const PropertiesPanel = memo(function PropertiesPanel({ module }: PropertiesPanelProps) {
   const { setSelectedModuleId } = useStore()
   const fqcn = module.collection ? `${module.collection}.${module.name}` : module.name
 
@@ -110,4 +111,4 @@ export function PropertiesPanel({ module }: PropertiesPanelProps) {
       </div>
     </div>
   )
-}
+})

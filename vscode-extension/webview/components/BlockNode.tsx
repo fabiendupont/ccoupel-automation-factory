@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { ModuleBlock } from '@af/shared'
 import { getSectionColor } from '@af/shared'
 import { useStore } from '../store'
@@ -11,7 +12,7 @@ interface BlockNodeProps {
 
 const BLOCK_SECTIONS: Array<'normal' | 'rescue' | 'always'> = ['normal', 'rescue', 'always']
 
-export function BlockNode({ block, allModules }: BlockNodeProps) {
+export const BlockNode = memo(function BlockNode({ block, allModules }: BlockNodeProps) {
   const { collapsedBlocks, collapsedBlockSections, toggleBlockCollapse, toggleBlockSection } =
     useStore()
 
@@ -80,4 +81,4 @@ export function BlockNode({ block, allModules }: BlockNodeProps) {
       )}
     </div>
   )
-}
+})

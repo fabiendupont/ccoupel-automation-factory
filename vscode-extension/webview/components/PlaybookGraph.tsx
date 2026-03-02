@@ -1,15 +1,31 @@
+import { useMemo } from 'react'
 import { useStore } from '../store'
 import { PlayCanvas } from './PlayCanvas'
 import { PropertiesPanel } from './PropertiesPanel'
 
 export function PlaybookGraph() {
-  const { plays, activePlayIndex, setActivePlayIndex, warnings, errors, selectedModuleId } = useStore()
+  // Narrow subscriptions: each selector returns a stable value (rule 5.8)
+  const plays = useStore((s) => s.plays)
+  const activePlayIndex = useStore((s) => s.activePlayIndex)
+  const setActivePlayIndex = useStore((s) => s.setActivePlayIndex)
+  const warnings = useStore((s) => s.warnings)
+  const errors = useStore((s) => s.errors)
+  const selectedModuleId = useStore((s) => s.selectedModuleId)
 
   const activePlay = plays[activePlayIndex]
   if (!activePlay) return null
 
+  // Build index map for O(1) module lookups (rule 7.2, 7.11)
+  const moduleIndex = useMemo(() => {
+    const map = new Map<string, (typeof activePlay.modules)[number]>()
+    for (const m of activePlay.modules) {
+      map.set(m.id, m)
+    }
+    return map
+  }, [activePlay.modules])
+
   const selectedModule = selectedModuleId
-    ? activePlay.modules.find((m) => m.id === selectedModuleId)
+    ? moduleIndex.get(selectedModuleId) ?? null
     : null
 
   return (

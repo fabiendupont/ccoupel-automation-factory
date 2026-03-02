@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react'
 import type { Play, ModuleBlock, PlaySectionName } from '@af/shared'
 import { getPlaySectionColor } from '@af/shared'
 import { SectionContent } from './SectionContent'
@@ -20,16 +21,19 @@ function getSectionLabel(section: PlaySectionName): string {
   }
 }
 
-export function PlayCanvas({ play }: PlayCanvasProps) {
-  // Group modules by section
-  const sectionModules: Record<string, ModuleBlock[]> = {}
-  for (const section of PLAY_SECTIONS) {
-    sectionModules[section] = play.modules.filter(
-      (m) => m.parentSection === section && !m.parentId
-    )
-  }
+export const PlayCanvas = memo(function PlayCanvas({ play }: PlayCanvasProps) {
+  // Group modules by section — derive during render (rule 5.1)
+  const sectionModules = useMemo(() => {
+    const grouped: Record<string, ModuleBlock[]> = {}
+    for (const section of PLAY_SECTIONS) {
+      grouped[section] = play.modules.filter(
+        (m) => m.parentSection === section && !m.parentId
+      )
+    }
+    return grouped
+  }, [play.modules])
 
-  // Show play attributes summary
+  // Derive attribute summary (rule 5.1)
   const attrs = play.attributes
   const attrItems: string[] = []
   if (attrs?.hosts) attrItems.push(`hosts: ${attrs.hosts}`)
@@ -37,7 +41,6 @@ export function PlayCanvas({ play }: PlayCanvasProps) {
   if (attrs?.gatherFacts === false) attrItems.push('gather_facts: false')
   if (attrs?.connection) attrItems.push(`connection: ${attrs.connection}`)
 
-  // Variables summary
   const varCount = play.variables.length
 
   return (
@@ -86,4 +89,4 @@ export function PlayCanvas({ play }: PlayCanvasProps) {
       })}
     </div>
   )
-}
+})

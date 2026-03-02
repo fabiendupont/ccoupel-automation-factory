@@ -1,12 +1,24 @@
+import { memo, useMemo } from 'react'
 import type { ModuleBlock, Link } from '@af/shared'
 import { getLinkStyle, getModuleOrVirtual, getModuleDimensions } from '@af/shared'
+
+const EMPTY_SET = new Set<string>()
 
 interface SectionLinksProps {
   links: Link[]
   modules: ModuleBlock[]
 }
 
-export function SectionLinks({ links, modules }: SectionLinksProps) {
+export const SectionLinks = memo(function SectionLinks({ links, modules }: SectionLinksProps) {
+  // Build index map for O(1) module lookups (rule 7.2, 7.11)
+  const moduleIndex = useMemo(() => {
+    const map = new Map<string, ModuleBlock>()
+    for (const m of modules) {
+      map.set(m.id, m)
+    }
+    return map
+  }, [modules])
+
   if (links.length === 0) return null
 
   return (
@@ -16,9 +28,8 @@ export function SectionLinks({ links, modules }: SectionLinksProps) {
         const toModule = getModuleOrVirtual(link.to, modules)
         if (!fromModule || !toModule) return null
 
-        const emptySet = new Set<string>()
-        const fromDims = getModuleDimensions(fromModule, modules, emptySet, emptySet)
-        const toDims = getModuleDimensions(toModule, modules, emptySet, emptySet)
+        const fromDims = getModuleDimensions(fromModule, modules, EMPTY_SET, EMPTY_SET)
+        const toDims = getModuleDimensions(toModule, modules, EMPTY_SET, EMPTY_SET)
 
         // Connection points: right side of source → left side of target
         const x1 = fromModule.x + fromDims.width
@@ -50,4 +61,4 @@ export function SectionLinks({ links, modules }: SectionLinksProps) {
       })}
     </svg>
   )
-}
+})
