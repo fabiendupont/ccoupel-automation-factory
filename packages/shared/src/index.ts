@@ -63,3 +63,11 @@ export type { ParseResult } from './parsers/yamlParser'
 
 // YAML generator
 export { generateYaml } from './generators/yamlGenerator'
+
+// Message protocol
+export type {
+  UpdateMessage,
+  EditFullMessage,
+  HostToWebviewMessage,
+  WebviewToHostMessage,
+} from './types/messages'
