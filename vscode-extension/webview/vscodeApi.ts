@@ -1,5 +1,7 @@
+import type { WebviewToHostMessage } from '@af/shared'
+
 interface VsCodeApi {
-  postMessage(message: unknown): void
+  postMessage(message: WebviewToHostMessage): void
   getState(): unknown
   setState(state: unknown): void
 }
