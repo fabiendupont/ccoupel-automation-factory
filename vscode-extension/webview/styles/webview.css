@@ -439,3 +439,142 @@ code {
   background: var(--vscode-badge-background);
   color: var(--vscode-badge-foreground);
 }
+
+/* Form inputs */
+.prop-input {
+  flex: 1;
+  padding: 2px 6px;
+  font-size: 0.85em;
+  font-family: inherit;
+  color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, transparent);
+  border-radius: 2px;
+  outline: none;
+  min-width: 0;
+}
+
+.prop-input:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+.prop-input.mono {
+  font-family: var(--vscode-editor-font-family, monospace);
+}
+
+.prop-checkbox {
+  accent-color: var(--vscode-focusBorder);
+  cursor: pointer;
+}
+
+.prop-empty {
+  font-size: 0.85em;
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+  padding: 4px 0;
+}
+
+.properties-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.delete-btn {
+  border: none;
+  background: none;
+  color: var(--vscode-errorForeground);
+  font-size: 0.85em;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.delete-btn:hover {
+  background: rgba(255, 0, 0, 0.1);
+}
+
+/* Variable / parameter rows */
+.var-row {
+  display: flex;
+  gap: 4px;
+  padding: 2px 0;
+  align-items: center;
+}
+
+.var-input {
+  padding: 2px 4px;
+  font-size: 0.85em;
+  font-family: var(--vscode-editor-font-family, monospace);
+  color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, transparent);
+  border-radius: 2px;
+  outline: none;
+  min-width: 0;
+}
+
+.var-input:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+.var-key {
+  flex: 0 0 80px;
+}
+
+.var-value {
+  flex: 1;
+}
+
+.var-key-label {
+  flex: 0 0 80px;
+  font-size: 0.85em;
+  color: var(--vscode-descriptionForeground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.var-select {
+  padding: 2px;
+  font-size: 0.8em;
+  color: var(--vscode-dropdown-foreground);
+  background: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border, transparent);
+  border-radius: 2px;
+  outline: none;
+}
+
+.var-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  border: none;
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-radius: 3px;
+  font-size: 0.9em;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.var-add-btn:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+.var-remove-btn {
+  border: none;
+  background: none;
+  color: var(--vscode-descriptionForeground);
+  font-size: 1em;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.var-remove-btn:hover {
+  color: var(--vscode-errorForeground);
+}

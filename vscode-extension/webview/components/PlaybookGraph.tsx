@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import { useStore } from '../store'
 import { PlayCanvas } from './PlayCanvas'
 import { PropertiesPanel } from './PropertiesPanel'
+import { PlayAttributesPanel } from './PlayAttributesPanel'
+import { VariablesPanel } from './VariablesPanel'
 
 export function PlaybookGraph() {
   // Narrow subscriptions: each selector returns a stable value (rule 5.8)
@@ -62,11 +64,22 @@ export function PlaybookGraph() {
         <div className="canvas-container">
           <PlayCanvas play={activePlay} />
         </div>
-        {selectedModule && (
-          <div className="properties-container">
+        <div className="properties-container">
+          {selectedModule ? (
             <PropertiesPanel module={selectedModule} />
-          </div>
-        )}
+          ) : (
+            <>
+              <PlayAttributesPanel
+                attributes={activePlay.attributes ?? {}}
+                playName={activePlay.name}
+                playIndex={activePlayIndex}
+              />
+              <div className="properties-body">
+                <VariablesPanel variables={activePlay.variables} />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )
