@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import { parseYaml, isAnsiblePlaybook, generateYaml } from '@af/shared'
 import type { WebviewToHostMessage } from '@af/shared'
+import type { GalaxyService } from '../services/galaxyService'
 
 const DEBOUNCE_MS = 300
 
@@ -8,8 +9,14 @@ export class PlaybookEditorProvider implements vscode.CustomTextEditorProvider {
   static readonly viewType = 'automationFactory.playbookViewer'
 
   private debounceTimer: ReturnType<typeof setTimeout> | undefined
+  private readonly galaxyService: GalaxyService
 
-  constructor(private readonly context: vscode.ExtensionContext) {}
+  constructor(
+    private readonly context: vscode.ExtensionContext,
+    galaxyService: GalaxyService,
+  ) {
+    this.galaxyService = galaxyService
+  }
 
   async resolveCustomTextEditor(
     document: vscode.TextDocument,
@@ -64,6 +71,42 @@ export class PlaybookEditorProvider implements vscode.CustomTextEditorProvider {
           isUpdatingFromWebview = true
           await vscode.workspace.applyEdit(edit)
           isUpdatingFromWebview = false
+        }
+
+        if (msg.type === 'galaxy:search') {
+          try {
+            const collections = await this.galaxyService.searchCollections(msg.query)
+            webviewPanel.webview.postMessage({
+              type: 'galaxy:search-result',
+              collections,
+            })
+          } catch (err) {
+            webviewPanel.webview.postMessage({
+              type: 'galaxy:search-result',
+              collections: [],
+              error: err instanceof Error ? err.message : String(err),
+            })
+          }
+        }
+
+        if (msg.type === 'galaxy:modules') {
+          try {
+            const modules = await this.galaxyService.getModules(msg.namespace, msg.collection)
+            webviewPanel.webview.postMessage({
+              type: 'galaxy:modules-result',
+              namespace: msg.namespace,
+              collection: msg.collection,
+              modules,
+            })
+          } catch (err) {
+            webviewPanel.webview.postMessage({
+              type: 'galaxy:modules-result',
+              namespace: msg.namespace,
+              collection: msg.collection,
+              modules: [],
+              error: err instanceof Error ? err.message : String(err),
+            })
+          }
         }
       },
     )

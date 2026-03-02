@@ -1,9 +1,13 @@
 import * as vscode from 'vscode'
 import { PlaybookEditorProvider } from './providers/playbookEditorProvider'
+import { GalaxyService } from './services/galaxyService'
 
 export function activate(context: vscode.ExtensionContext) {
+  // Shared Galaxy service (cache persists across editor instances)
+  const galaxyService = new GalaxyService(context.globalState)
+
   // Register the custom editor provider
-  const provider = new PlaybookEditorProvider(context)
+  const provider = new PlaybookEditorProvider(context, galaxyService)
   context.subscriptions.push(
     vscode.window.registerCustomEditorProvider(
       PlaybookEditorProvider.viewType,
