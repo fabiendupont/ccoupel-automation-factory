@@ -5,6 +5,7 @@ import { PropertiesPanel } from './PropertiesPanel'
 import { PlayAttributesPanel } from './PlayAttributesPanel'
 import { VariablesPanel } from './VariablesPanel'
 import { ModulePalette } from './ModulePalette'
+import { GitStatusBar } from './GitStatusBar'
 
 export function PlaybookGraph() {
   // Narrow subscriptions: each selector returns a stable value (rule 5.8)
@@ -33,6 +34,9 @@ export function PlaybookGraph() {
 
   return (
     <div className="playbook-graph">
+      {/* Git status */}
+      <GitStatusBar />
+
       {/* Play tabs */}
       {plays.length > 1 && (
         <div className="play-tabs">

@@ -62,6 +62,34 @@ code {
   height: 100vh;
 }
 
+/* Git status bar */
+.git-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  font-size: 0.8em;
+  color: var(--vscode-descriptionForeground);
+  background: var(--vscode-editorGroupHeader-tabsBackground);
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.git-branch-name {
+  font-family: var(--vscode-editor-font-family, monospace);
+}
+
+.git-dirty-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vscode-gitDecoration-modifiedResourceForeground, #e2c08d);
+}
+
+.git-sync-count {
+  font-size: 0.9em;
+}
+
 /* Play tabs */
 .play-tabs {
   display: flex;

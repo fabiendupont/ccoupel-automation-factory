@@ -1,7 +1,8 @@
 import * as vscode from 'vscode'
 import { parseYaml, isAnsiblePlaybook, generateYaml } from '@af/shared'
-import type { WebviewToHostMessage } from '@af/shared'
+import type { WebviewToHostMessage, GitStatusResultMessage } from '@af/shared'
 import type { GalaxyService } from '../services/galaxyService'
+import type { GitWorkflowService } from '../git/gitWorkflowService'
 
 const DEBOUNCE_MS = 300
 
@@ -10,12 +11,15 @@ export class PlaybookEditorProvider implements vscode.CustomTextEditorProvider {
 
   private debounceTimer: ReturnType<typeof setTimeout> | undefined
   private readonly galaxyService: GalaxyService
+  private readonly gitService: GitWorkflowService
 
   constructor(
     private readonly context: vscode.ExtensionContext,
     galaxyService: GalaxyService,
+    gitService: GitWorkflowService,
   ) {
     this.galaxyService = galaxyService
+    this.gitService = gitService
   }
 
   async resolveCustomTextEditor(
@@ -54,8 +58,26 @@ export class PlaybookEditorProvider implements vscode.CustomTextEditorProvider {
       })
     }
 
-    // Initial parse
+    const sendGitStatus = () => {
+      const status = this.gitService.getStatus(document.uri)
+      if (!status) return
+      const msg: GitStatusResultMessage = {
+        type: 'git:status-result',
+        branch: status.branch,
+        dirty: status.dirty,
+        ahead: status.ahead,
+        behind: status.behind,
+      }
+      webviewPanel.webview.postMessage(msg)
+    }
+
+    // Initial parse + git status
     sendUpdate()
+    sendGitStatus()
+
+    // Listen for repository state changes
+    const repo = this.gitService.getRepository(document.uri)
+    const gitStateListener = repo?.state.onDidChange(() => sendGitStatus())
 
     // Webview → YAML: receive edits from visual editor
     const messageSubscription = webviewPanel.webview.onDidReceiveMessage(
@@ -125,6 +147,7 @@ export class PlaybookEditorProvider implements vscode.CustomTextEditorProvider {
     webviewPanel.onDidDispose(() => {
       messageSubscription.dispose()
       changeSubscription.dispose()
+      gitStateListener?.dispose()
       if (this.debounceTimer) clearTimeout(this.debounceTimer)
     })
   }

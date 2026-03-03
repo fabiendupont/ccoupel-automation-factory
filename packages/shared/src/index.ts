@@ -78,6 +78,7 @@ export type {
   GalaxySearchResultMessage,
   GalaxyModulesMessage,
   GalaxyModulesResultMessage,
+  GitStatusResultMessage,
   HostToWebviewMessage,
   WebviewToHostMessage,
 } from './types/messages'

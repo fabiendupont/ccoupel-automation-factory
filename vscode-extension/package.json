@@ -44,12 +44,35 @@
         "title": "Open as Text",
         "category": "Automation Factory",
         "icon": "$(code)"
+      },
+      {
+        "command": "automationFactory.commitAndSync",
+        "title": "Commit and Sync Playbook",
+        "category": "Automation Factory",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "automationFactory.createBranch",
+        "title": "Create Branch",
+        "category": "Automation Factory",
+        "icon": "$(git-branch-create)"
+      },
+      {
+        "command": "automationFactory.switchBranch",
+        "title": "Switch Branch",
+        "category": "Automation Factory",
+        "icon": "$(git-branch)"
       }
     ],
     "menus": {
       "editor/title": [
         {
           "command": "automationFactory.openTextEditor",
+          "when": "activeCustomEditorId == automationFactory.playbookViewer",
+          "group": "navigation"
+        },
+        {
+          "command": "automationFactory.commitAndSync",
           "when": "activeCustomEditorId == automationFactory.playbookViewer",
           "group": "navigation"
         }

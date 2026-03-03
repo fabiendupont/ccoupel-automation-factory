@@ -49,11 +49,21 @@ export interface GalaxyModulesResultMessage {
   error?: string
 }
 
+/** Host → Webview: git status snapshot. */
+export interface GitStatusResultMessage {
+  type: 'git:status-result'
+  branch: string | undefined
+  dirty: boolean
+  ahead: number
+  behind: number
+}
+
 /** Union of all messages the webview can receive. */
 export type HostToWebviewMessage =
   | UpdateMessage
   | GalaxySearchResultMessage
   | GalaxyModulesResultMessage
+  | GitStatusResultMessage
 
 /** Union of all messages the host can receive from the webview. */
 export type WebviewToHostMessage =
